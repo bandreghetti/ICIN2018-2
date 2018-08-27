@@ -58,7 +58,7 @@ symbols = np.array([
     1,0,0,0,0,0,0,
     1,0,0,0,0,0,0,
     1,0,0,0,0,0,0,
-    1,0,0,0,0,0,1,
+    1,0,0,0,0,1,1,
     1,0,0,0,0,0,1,
     0,1,0,0,0,0,1,
     0,0,1,1,1,1,1
@@ -167,14 +167,34 @@ symbols = np.array([
 
 labels = np.eye(16)
 
-def randsymbols():
-    for symbol in symbols:
-        print(symbol)
+def getSymbols(noise=0):
+    _symbols = np.copy(symbols)
+    if noise is 0:
+        return _symbols
+    for symbol in _symbols:
+        flipidx = np.less(np.random.random(63), noise)
+        symbol[flipidx] = np.invert(symbol[flipidx])
+    return _symbols
 
-def plotsymbols(symbols):
+def getLabels():
+    return np.copy(labels)
+
+def plotSymbols(symbols):
     _, axeslist = plt.subplots(ncols=4, nrows=4)
     for idx, symb in enumerate(symbols):
-        axeslist.ravel()[idx].imshow(np.reshape(symb, (9, 7)), cmap=plt.gray())
+        axeslist.ravel()[idx].imshow(np.reshape(symb, (9, 7)))
         axeslist.ravel()[idx].set_axis_off()
     plt.tight_layout()
+    plt.show()
+
+def plotPrediction(sample, prediction):
+    fig, axeslist = plt.subplots(ncols=16, nrows=2)
+    for idx, symb in enumerate(sample):
+        axeslist.ravel()[idx].imshow(np.reshape(symb, (9, 7)))
+        axeslist.ravel()[idx].set_axis_off()
+    for idx, pred in enumerate(prediction):
+        axeslist.ravel()[idx+16].imshow(np.reshape(symbols[pred], (9, 7)))
+        axeslist.ravel()[idx+16].set_axis_off()
+
+    # plt.tight_layout()
     plt.show()

@@ -7,17 +7,39 @@ import chars
 from matplotlib import pyplot as plt
 
 def main():
-    chars.plotsymbols(chars.symbols)
-    # model = Sequential()
+    pattern = chars.getSymbols()
+    target = chars.getLabels()
+    for _ in range(20):
+        pattern = np.append(pattern, chars.getSymbols(noise=0.1), axis=0)
+        target = np.append(target, chars.getLabels(), axis=0)
+    for _ in range(20):
+        pattern = np.append(pattern, chars.getSymbols(noise=0.2), axis=0)
+        target = np.append(target, chars.getLabels(), axis=0)
+    for _ in range(20):
+        pattern = np.append(pattern, chars.getSymbols(noise=0.3), axis=0)
+        target = np.append(target, chars.getLabels(), axis=0)
 
-    # model.add(Dense(units=32, activation='sigmoid', input_dim=63))
-    # model.add(Dense(units=24, activation='sigmoid'))
-    # model.add(Dense(units=16, activation='sigmoid'))
+    model = Sequential()
 
-    # model.compile(optimizer='adam', loss='mean_squared_error')
+    model.add(Dense(units=32, activation='sigmoid', input_dim=63))
+    model.add(Dense(units=24, activation='sigmoid'))
+    model.add(Dense(units=16, activation='sigmoid'))
 
-    # model.fit(chars.symbols, chars.labels, batch_size=1, epochs=500, verbose=2)
+    model.compile(optimizer='adam', loss='mean_squared_error')
 
-    # print(np.argmax(model.predict(chars.symbols), axis=1))
+    model.fit(pattern, target, batch_size=16, epochs=1000, verbose=2)
+
+    sample = chars.getSymbols(0.1)
+    prediction = np.argmax(model.predict(sample), axis=1)
+    chars.plotPrediction(sample, prediction)
+
+    sample = chars.getSymbols(0.2)
+    prediction = np.argmax(model.predict(sample), axis=1)
+    chars.plotPrediction(sample, prediction)
+
+    sample = chars.getSymbols(0.3)
+    prediction = np.argmax(model.predict(sample), axis=1)
+    chars.plotPrediction(sample, prediction)
+
 
 main()
