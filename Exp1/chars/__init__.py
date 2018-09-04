@@ -187,8 +187,8 @@ def plotSymbols(symbols):
     plt.tight_layout()
     plt.show()
 
-def plotPrediction(sample, prediction):
-    fig, axeslist = plt.subplots(ncols=16, nrows=2)
+def plotPrediction(sample, prediction, fileName='prediction.png'):
+    _, axeslist = plt.subplots(ncols=16, nrows=2)
     for idx, symb in enumerate(sample):
         axeslist.ravel()[idx].imshow(np.reshape(symb, (9, 7)))
         axeslist.ravel()[idx].set_axis_off()
@@ -196,5 +196,5 @@ def plotPrediction(sample, prediction):
         axeslist.ravel()[idx+16].imshow(np.reshape(symbols[pred], (9, 7)))
         axeslist.ravel()[idx+16].set_axis_off()
 
-    # plt.tight_layout()
-    plt.show()
+    plt.savefig(fileName, bbox_inches='tight')
+    # plt.show()
