@@ -188,6 +188,7 @@ def plotSymbols(symbols):
     plt.show()
 
 def plotPrediction(sample, prediction, fileName='prediction.png'):
+    fig = plt.figure()
     _, axeslist = plt.subplots(ncols=16, nrows=2)
     for idx, symb in enumerate(sample):
         axeslist.ravel()[idx].imshow(np.reshape(symb, (9, 7)))
@@ -198,3 +199,4 @@ def plotPrediction(sample, prediction, fileName='prediction.png'):
 
     plt.savefig(fileName, bbox_inches='tight')
     # plt.show()
+    plt.close(fig)
