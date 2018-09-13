@@ -22,6 +22,7 @@ actionMeaning = {
     17 : "DOWNLEFTFIRE",
 }
 
+EXIT          = -1
 NOOP          = 0
 FIRE          = 1
 UP            = 2
@@ -127,6 +128,8 @@ class Joypad():
                 self.action = DOWNRIGHTFIRE
             elif(self.action == LEFTFIRE):
                 self.action = DOWNLEFTFIRE
+        elif(key == Key.esc):
+            self.action = EXIT
 
     def on_release(self, key):
         if(key == Key.space):
