@@ -46,6 +46,7 @@ class Joypad():
     def __init__(self):
         self.action = NOOP
         self.lastKey = None
+        self.autoplay = False
     
     def actionString(self):
         return actionMeaning[self.action]
@@ -53,6 +54,66 @@ class Joypad():
     def actionOneHot(self):
         ret = np.zeros(18, dtype=np.float64)
         np.put(ret, self.action, 1)
+        return ret
+
+    def actionButtons(self):
+        bFIRE  = 0
+        bUP    = 1
+        bRIGHT = 2
+        bLEFT  = 3
+        bDOWN  = 4
+        ret = np.zeros(5, dtype=np.float64)
+        if(self.action == FIRE):
+            np.put(ret, bFIRE, 1)
+        elif self.action == UP:
+            np.put(ret, bUP, 1)
+        elif self.action == RIGHT:
+            np.put(ret, bRIGHT, 1)
+        elif self.action == LEFT:
+            np.put(ret, bLEFT, 1)
+        elif self.action == DOWN:
+            np.put(ret, bDOWN, 1)
+        elif self.action == UPRIGHT:
+            np.put(ret, bUP, 1)
+            np.put(ret, bRIGHT, 1)
+        elif self.action == UPLEFT:
+            np.put(ret, bUP, 1)
+            np.put(ret, bLEFT, 1)
+        elif self.action == DOWNRIGHT:
+            np.put(ret, bDOWN, 1)
+            np.put(ret, bRIGHT, 1)
+        elif self.action == DOWNLEFT:
+            np.put(ret, bDOWN, 1)
+            np.put(ret, bLEFT, 1)
+        elif self.action == UPFIRE:
+            np.put(ret, bUP, 1)
+            np.put(ret, bFIRE, 1)
+        elif self.action == RIGHTFIRE:
+            np.put(ret, bRIGHT, 1)
+            np.put(ret, bFIRE, 1)
+        elif self.action == LEFTFIRE:
+            np.put(ret, bLEFT, 1)
+            np.put(ret, bFIRE, 1)
+        elif self.action == DOWNFIRE:
+            np.put(ret, bDOWN, 1)
+            np.put(ret, bFIRE, 1)
+        elif self.action == UPRIGHTFIRE:
+            np.put(ret, bUP, 1)
+            np.put(ret, bRIGHT, 1)
+            np.put(ret, bFIRE, 1)
+        elif self.action == UPLEFTFIRE:
+            np.put(ret, bUP, 1)
+            np.put(ret, bLEFT, 1)
+            np.put(ret, bFIRE, 1)
+        elif self.action == DOWNRIGHTFIRE:
+            np.put(ret, bDOWN, 1)
+            np.put(ret, bRIGHT, 1)
+            np.put(ret, bFIRE, 1)
+        elif self.action == DOWNLEFTFIRE:
+            np.put(ret, bDOWN, 1)
+            np.put(ret, bLEFT, 1)
+            np.put(ret, bFIRE, 1)
+            
         return ret
 
     def on_press(self, key):
@@ -128,6 +189,8 @@ class Joypad():
                 self.action = DOWNRIGHTFIRE
             elif(self.action == LEFTFIRE):
                 self.action = DOWNLEFTFIRE
+        elif(key == Key.tab):
+            self.autoplay = not self.autoplay
         elif(key == Key.esc):
             self.action = EXIT
 
