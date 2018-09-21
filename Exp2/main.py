@@ -6,8 +6,8 @@ from matplotlib import pyplot as plt
 from Adaline import adaline
 
 bands = [0, 1] # 0 for 0.01 and 1 for 0.05
-muList = [0.003, 0.01, 0.03, 0.1, 0.3]
-nDelaysList = [8, 16, 32, 64, 128, 256]
+muList = [0.001, 0.003, 0.01, 0.03, 0.1, 0.3]
+nDelaysList = [8, 16, 32, 64, 128, 256, 512]
 
 def main():
     for band in bands:
@@ -24,6 +24,16 @@ def main():
         t = np.concatenate((t1, t2))
         y = np.concatenate((y1, y2))
         
+        bestAdaptive = None
+        bestFixed = None
+        bestDesign = None
+        bestAdaptiveErr = 9999
+        bestFixedErr = 9999
+        bestDesignErr = 9999
+        bestAdaptiveParams = (0, 0)
+        bestFixedParams = (0, 0)
+        bestDesignParams = 0
+
         for nDelays in nDelaysList:
             ########################################################
             
@@ -49,26 +59,61 @@ def main():
 
             # NEWLIND Fixed weights wd - Designed
             yDesign, _, mseDesign = adaline(u, y, wDesign)
+            if mseDesign < bestDesignErr:
+                bestDesignErr = mseDesign
+                bestDesign = yDesign
+                bestDesignParams = nDelays
 
             ########################################################
             for mu in muList:
-                yAdaptative, _, mseAdaptative, wHistoryAdaptative = adaline(u, y, mu=mu, nDelays=nDelays)
-                yFixed, _, mseFixed = adaline(u, y, wHistoryAdaptative[-1, :])
+                yAdaptive, _, mseAdaptive, wHistoryAdaptive = adaline(u, y, mu=mu, nDelays=nDelays)
+                if mseAdaptive < bestAdaptiveErr:
+                    bestAdaptiveErr = mseAdaptive
+                    bestAdaptive = yAdaptive
+                    bestAdaptiveParams = (nDelays, mu)
+                
+                yFixed, _, mseFixed = adaline(u, y, wHistoryAdaptive[-1, :])
+                if mseFixed < bestFixedErr:
+                    bestFixedErr = mseFixed
+                    bestFixed = yFixed
+                    bestFixedParams = (nDelays, mu)
 
-                plt.figure(figsize=(16, 9))
+
+                fig = plt.figure(figsize=(8,4.5))
                 plt.xlim(-5, 125)
                 plt.plot(t, u, label='input')
                 plt.plot(t, y, label='signal')
-                plt.plot(t, yAdaptative, label='adaptative err={:.2f}'.format(mseAdaptative))
-                plt.plot(t, yFixed, label='fixed err={:.2f}'.format(mseFixed))
+                if mseAdaptive < 10:
+                    plt.plot(t, yAdaptive, label='adaptive err={:.3f}'.format(mseAdaptive))
+                    plt.plot(t, yFixed, label='fixed err={:.2f}'.format(mseFixed))
                 plt.plot(t, yDesign, label='design err={:.2f}'.format(mseDesign))
 
                 plt.legend()
-                fileName = 'results_band={0}_nDelays={1:03d}_mu={2:.2f}.png'.format(band, nDelays, mu)
+                fileName = 'results_band={0}_nDelays={1:03d}_mu={2:.3f}.png'.format(band, nDelays, mu)
                 try:
                     plt.savefig(fileName, dpi=300)
                 except:
                     print('{} diverged too much, failed to plot'.format(fileName))
+                plt.close(fig)
+        if band == 0:
+            title = 'Best results for $1\%$ of Nyquist\'s band'
+        else:
+            title = 'Best results for $5\%$ of Nyquist\'s band'
+        fileName = 'best_band={}'.format(band)
+        fig = plt.figure(figsize=(8,4.5))
+        plt.xlim(-5, 125)
+        plt.plot(t, u, label='input')
+        plt.plot(t, y, label='true output')
+        plt.plot(t, bestAdaptive, label='adaptive $\mu$={} $L$={} $\epsilon$={:.3f}'.format(bestAdaptiveParams[0], bestAdaptiveParams[1], bestAdaptiveErr))
+        plt.plot(t, bestFixed, label='fixed $\mu$={} $L$={} $\epsilon$={:.3f}'.format(bestFixedParams[0], bestFixedParams[1], bestFixedErr))
+        plt.plot(t, bestDesign, label='design $L$={} $\epsilon$={:.3f}'.format(bestDesignParams, bestDesignErr))
+        plt.title(title)
+        plt.xlabel('Time (seconds)')
+        plt.ylabel('Amplitude')
+        plt.legend()
+        plt.savefig(fileName, dpi=300)
+        plt.close(fig)
+
 
 if __name__ == '__main__':
     main()
