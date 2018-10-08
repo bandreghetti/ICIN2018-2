@@ -59,3 +59,5 @@ target/
 
 .vscode/
 *.png
+Exp3/caltech101/
+Exp3/caltech101.tar.gz
