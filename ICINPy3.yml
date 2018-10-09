@@ -14,7 +14,8 @@ dependencies:
   - blas=1.0=mkl
   - bleach=2.1.4=py36_0
   - ca-certificates=2018.03.07=0
-  - certifi=2018.8.13=py36_0
+  - cairo=1.14.12=h8948797_3
+  - certifi=2018.8.24=py36_1
   - cffi=1.11.5=py36h9745a5d_0
   - constantly=15.1.0=py36h28b3542_0
   - cryptography=2.3.1=py36hc365091_0
@@ -25,13 +26,17 @@ dependencies:
   - expat=2.2.5=he0dffb1_0
   - fontconfig=2.13.0=h9420a91_0
   - freetype=2.9.1=h8a8886c_0
+  - fribidi=1.0.4=h14c3975_0
   - gast=0.2.0=py36_0
   - glib=2.56.1=h000015b_0
   - gmp=6.1.2=h6c8ec71_1
+  - graphite2=1.3.12=h23475e2_2
+  - graphviz=2.40.1=h21bd128_2
   - grpcio=1.12.1=py36hdbcaa40_0
   - gst-plugins-base=1.14.0=hbbd80ab_1
   - gstreamer=1.14.0=hb453b48_1
   - h5py=2.8.0=py36h8d01980_0
+  - harfbuzz=1.8.8=hffaf4a1_0
   - hdf5=1.10.2=hba1933b_1
   - html5lib=1.0.1=py36_0
   - hyperlink=18.0.0=py36_0
@@ -66,6 +71,7 @@ dependencies:
   - libprotobuf=3.6.0=hdbcaa40_0
   - libsodium=1.0.16=h1bed415_0
   - libstdcxx-ng=8.2.0=hdf63c60_1
+  - libtiff=4.0.9=he85c1e1_2
   - libuuid=1.0.3=h1bed415_2
   - libxcb=1.13=h1bed415_1
   - libxml2=2.9.8=h26e45fe_1
@@ -86,11 +92,13 @@ dependencies:
   - openssl=1.0.2p=h14c3975_0
   - pandoc=2.2.1=h629c226_0
   - pandocfilters=1.4.2=py36_1
+  - pango=1.42.4=h049681c_0
   - parso=0.3.1=py36_0
   - pcre=8.42=h439df22_0
   - pexpect=4.6.0=py36_0
   - pickleshare=0.7.4=py36_0
   - pip=10.0.1=py36_0
+  - pixman=0.34.0=hceecf20_3
   - prometheus_client=0.3.1=py36_0
   - prompt_toolkit=1.0.15=py36_0
   - protobuf=3.6.0=py36hf484d3e_0
@@ -143,4 +151,3 @@ dependencies:
   - zope=1.0=py36_0
   - zope.interface=4.5.0=py36h14c3975_0
 prefix: /home/bad/anaconda3/envs/ICINPy3
-
