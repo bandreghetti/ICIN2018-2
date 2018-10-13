@@ -1,32 +1,36 @@
 import os
 import numpy as np 
-import imageio
 from scipy import ndimage
-from skimage.transform import resize
+from keras.preprocessing.image import load_img
 
 class Dataset():
     def __init__(self):
-        self.dataClassList = []
-        for _, b, _ in os.walk('caltech101'):
-            if len(b) > 0:
-                for dataClass in b:
-                    if dataClass != 'BACKGROUND_Google':
-                        self.dataClassList.append(dataClass)
+        self.folderName = 'caltech101_test'
+        self.bgFolder = 'BACKGROUND_Google'
+        self.imgSize = [240, 300]
+
+        self.dataClassList = os.listdir(self.folderName)
+        self.dataClassList.remove(self.bgFolder)
+        
         self.nClasses = len(self.dataClassList)
-        self.x = np.empty((0, 240, 298))
-        self.y = np.empty((0, self.nClasses))
+        self.data = {}
+        self.target = {}
+        
         for classIdx, c in enumerate(self.dataClassList):
-            for cPath, _, data in os.walk(os.path.join('caltech101', c)):
-                for img in data:
-                    image = imageio.imread(os.path.join(cPath, img), pilmode='L')
-                    image = resize(image, (240, 298), mode='reflect', anti_aliasing=True)
-                    image = np.expand_dims(image, 0)
-                    target = np.zeros((1, self.nClasses))
-                    np.put(target, classIdx, 1)
-                    self.x = np.append(self.x, image, axis=0)
-                    self.y = np.append(self.y, target, axis=0)
+            self.data[c] = np.empty([0] + self.imgSize)
+            self.target[c] = np.zeros((1, self.nClasses))
+            np.put(self.target[c], classIdx, 1)
+            
 
-        print(self.x.shape)
-        print(self.y.shape)
+            cPath = os.path.join(self.folderName, c)
+            for img in os.listdir(cPath):
+                imgPath = os.path.join(cPath, img)
+                image = load_img(imgPath, color_mode='grayscale', target_size=self.imgSize)
+                image = np.expand_dims(image, 0)
+                self.x = np.append(self.x, image, axis=0)
+                self.y = np.append(self.y, target, axis=0)
 
-
+    def getData(self, train=0.7, validation=0.2, test=0.1):
+        if train+validation+test != 1:
+            print('error: train+validation+test must add up to 1.0')
+            return None, None, None, None
