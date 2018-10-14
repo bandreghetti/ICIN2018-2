@@ -1,4 +1,4 @@
-#PBS -N $1
+#PBS -N lastJob
 source activate ICIN
 cd ~/ICIN2018-2/Exp3
 echo Starting calculation

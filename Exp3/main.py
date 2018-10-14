@@ -60,6 +60,8 @@ def main():
 
     earlyStopping = EarlyStopping(monitor='val_loss', patience=10, verbose=1)
 
+    print('Training {} for {} epochs'.format(modelName, nEpochs))
+
     model.fit(x_train, y_train, validation_data=(x_test, y_test), 
           epochs=nEpochs, batch_size=50, shuffle=True, callbacks=[earlyStopping])
 
