@@ -40,19 +40,19 @@ def main():
         model = Sequential()
         # This is the basic model very similar to the one available in the example
         if modelName == 'model1':
-            model.add(Conv2D(64, (3, 3), input_shape=x_train[0].shape, padding='same', activation='relu'))
+            model.add(Conv2D(32, (3, 3), input_shape=x_train[0].shape, padding='same', activation='relu'))
+            model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+
+            model.add(Conv2D(64, (3, 3), activation='relu', padding='same'))
             model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
 
             model.add(Conv2D(128, (3, 3), activation='relu', padding='same'))
             model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
 
-            model.add(Conv2D(256, (3, 3), activation='relu', padding='same'))
-            model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
-
             model.add(Flatten())
-            model.add(Dense(2048, activation='relu'))
+            model.add(Dense(512, activation='relu'))
             model.add(Dropout(0.5))
-            model.add(Dense(1024, activation='relu'))
+            model.add(Dense(256, activation='relu'))
             model.add(Dropout(0.5))
         # This is a network with bigger kernels and more filters. Will probably take more time to train
         elif modelName == 'model2':
