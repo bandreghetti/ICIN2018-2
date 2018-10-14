@@ -84,6 +84,9 @@ def main():
             model.add(Flatten())
             model.add(Dense(2048, activation='relu'))
             model.add(Dense(1024, activation='relu'))
+        else:
+            print('Unknown model {}. Exiting.'.format(modelName))
+            exit()
 
         model.add(Dense(num_classes, activation='softmax'))
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
