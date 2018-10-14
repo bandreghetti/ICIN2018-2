@@ -1,0 +1,6 @@
+#PBS -N $1
+source activate ICIN
+cd ~/ICIN2018-2/Exp3
+echo Starting calculation
+./main.py $1 $2
+echo End of calculation

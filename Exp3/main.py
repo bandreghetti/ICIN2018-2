@@ -3,6 +3,7 @@
 import numpy as np
 import time
 import os
+import sys
 
 from keras.datasets import cifar100
 
@@ -14,7 +15,12 @@ from keras.callbacks import EarlyStopping
 from keras.utils import to_categorical
 
 def main():
-    modelName = 'model1'
+    if len(sys.argv) < 3:
+        print("Usage: './main.py <modelname> <n_epochs>")
+
+    modelName = sys.argv[1]
+    nEpochs = int(sys.argv[2])
+
     modelFilename = '{}.h5'.format(modelName)
     
     np.random.seed(int(time.time()))
@@ -26,10 +32,10 @@ def main():
     num_classes = y_test[0].size
 
     if os.path.isfile(modelFilename):
-        print('Loading pre-trained model')
+        print('Loading pre-trained model {}'.format(modelName))
         model = load_model(modelFilename)
     else:
-        print('Creating model')
+        print('Creating model {}'.format(modelName))
         model = Sequential()
 
         model.add(Conv2D(64, (3, 3), input_shape=x_train[0].shape, padding='same', activation='relu'))
@@ -55,7 +61,7 @@ def main():
     earlyStopping = EarlyStopping(monitor='val_loss', patience=10, verbose=1)
 
     model.fit(x_train, y_train, validation_data=(x_test, y_test), 
-          epochs=4, batch_size=50, shuffle=True, callbacks=[earlyStopping])
+          epochs=nEpochs, batch_size=50, shuffle=True, callbacks=[earlyStopping])
 
     model.save(modelFilename)
 
