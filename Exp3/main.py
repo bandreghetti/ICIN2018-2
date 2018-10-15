@@ -56,13 +56,13 @@ def main():
             model.add(Dropout(0.5))
         # This is a network with bigger kernels and more filters. Will probably take more time to train
         elif modelName == 'model2':
-            model.add(Conv2D(128, (5, 5), input_shape=x_train[0].shape, padding='same', activation='relu'))
+            model.add(Conv2D(40, (5, 5), input_shape=x_train[0].shape, padding='same', activation='relu'))
             model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
 
-            model.add(Conv2D(256, (5, 5), activation='relu', padding='same'))
+            model.add(Conv2D(80, (5, 5), activation='relu', padding='same'))
             model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
 
-            model.add(Conv2D(512, (5, 5), activation='relu', padding='same'))
+            model.add(Conv2D(160, (5, 5), activation='relu', padding='same'))
             model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
 
             model.add(Flatten())
@@ -73,17 +73,15 @@ def main():
         # This network uses no Dropout and only valid pixels. Maybe it works better.
         elif modelName == 'model3':
             model.add(Conv2D(64, (3, 3), input_shape=x_train[0].shape, padding='valid', activation='relu'))
+            model.add(Conv2D(64, (3, 3), activation='relu', padding='valid'))
             model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
 
-            model.add(Conv2D(128, (3, 3), activation='relu', padding='valid'))
-            model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
-
-            model.add(Conv2D(256, (3, 3), activation='relu', padding='valid'))
+            model.add(Conv2D(64, (3, 3), activation='relu', padding='valid'))
             model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
 
             model.add(Flatten())
-            model.add(Dense(2048, activation='relu'))
-            model.add(Dense(1024, activation='relu'))
+            model.add(Dense(512, activation='relu'))
+            model.add(Dense(256, activation='relu'))
         else:
             print('Unknown model {}. Exiting.'.format(modelName))
             exit()
@@ -93,12 +91,12 @@ def main():
         
         model.save(modelFilename)
 
-    earlyStopping = EarlyStopping(monitor='val_loss', patience=10, verbose=1)
+    earlyStopping = EarlyStopping(monitor='val_loss', patience=100, verbose=1)
 
     print('Training {} for {} epochs'.format(modelName, nEpochs))
 
     model.fit(x_train, y_train, validation_data=(x_test, y_test), 
-          epochs=nEpochs, batch_size=50, shuffle=True,
+          epochs=nEpochs, batch_size=1, shuffle=True,
           callbacks=[earlyStopping], verbose=2)
 
     model.save(modelFilename)
