@@ -96,7 +96,7 @@ def main():
     print('Training {} for {} epochs'.format(modelName, nEpochs))
 
     model.fit(x_train, y_train, validation_data=(x_test, y_test), 
-          epochs=nEpochs, batch_size=1, shuffle=True,
+          epochs=nEpochs, batch_size=500, shuffle=True,
           callbacks=[earlyStopping], verbose=2)
 
     model.save(modelFilename)
