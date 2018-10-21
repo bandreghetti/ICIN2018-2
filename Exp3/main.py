@@ -5,7 +5,7 @@ import time
 import os
 import sys
 
-from keras.datasets import cifar100
+from keras.datasets import cifar10
 
 from keras.models import Sequential, load_model
 from keras.layers import Dense, Dropout, Flatten
@@ -22,10 +22,14 @@ def main():
     nEpochs = int(sys.argv[2])
 
     modelFilename = '{}.h5'.format(modelName)
-    
+
     np.random.seed(int(time.time()))
 
-    (x_train, y_train_idx), (x_test, y_test_idx) = cifar100.load_data(label_mode='fine')
+    (x_train, y_train_idx), (x_test, y_test_idx) = cifar10.load_data()
+
+    x_train = x_train.astype('float64') / 255.0
+    x_test = x_test.astype('float64') / 255.0
+
     y_train = to_categorical(y_train_idx)
     y_test = to_categorical(y_test_idx)
 
@@ -36,24 +40,28 @@ def main():
         model = load_model(modelFilename)
     else:
         print('Creating model {}'.format(modelName))
-        
+
         model = Sequential()
         # This is the basic model very similar to the one available in the example
         if modelName == 'model1':
-            model.add(Conv2D(32, (3, 3), input_shape=x_train[0].shape, padding='same', activation='relu'))
-            model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
-
+            model.add(Conv2D(32, (3, 3), input_shape=(32, 32, 3), activation='relu', padding='same'))
+            model.add(Dropout(0.2))
+            model.add(Conv2D(32, (3, 3), activation='relu', padding='same'))
+            model.add(MaxPooling2D(pool_size=(2, 2)))
             model.add(Conv2D(64, (3, 3), activation='relu', padding='same'))
-            model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
-
+            model.add(Dropout(0.2))
+            model.add(Conv2D(64, (3, 3), activation='relu', padding='same'))
+            model.add(MaxPooling2D(pool_size=(2, 2)))
             model.add(Conv2D(128, (3, 3), activation='relu', padding='same'))
-            model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
-
+            model.add(Dropout(0.2))
+            model.add(Conv2D(128, (3, 3), activation='relu', padding='same'))
+            model.add(MaxPooling2D(pool_size=(2, 2)))
             model.add(Flatten())
+            model.add(Dropout(0.2))
+            model.add(Dense(1024, activation='relu'))
+            model.add(Dropout(0.2))
             model.add(Dense(512, activation='relu'))
-            model.add(Dropout(0.5))
-            model.add(Dense(256, activation='relu'))
-            model.add(Dropout(0.5))
+            model.add(Dropout(0.2))
         # This is a network with bigger kernels and more filters. Will probably take more time to train
         elif modelName == 'model2':
             model.add(Conv2D(40, (5, 5), input_shape=x_train[0].shape, padding='same', activation='relu'))
@@ -88,16 +96,19 @@ def main():
 
         model.add(Dense(num_classes, activation='softmax'))
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-        
+
         model.save(modelFilename)
 
-    earlyStopping = EarlyStopping(monitor='val_loss', patience=100, verbose=1)
+    earlyStopping = EarlyStopping(monitor='val_loss', patience=10, verbose=1)
 
     print('Training {} for {} epochs'.format(modelName, nEpochs))
 
-    model.fit(x_train, y_train, validation_data=(x_test, y_test), 
-          epochs=nEpochs, batch_size=500, shuffle=True,
+    model.fit(x_train, y_train, validation_data=(x_test, y_test),
+          epochs=nEpochs, batch_size=128, shuffle=True,
           callbacks=[earlyStopping], verbose=2)
+
+    scores = model.evaluate(x_test, y_test, verbose=0)
+    print("Accuracy: %.2f%%" % (scores[1]*100))
 
     model.save(modelFilename)
 
