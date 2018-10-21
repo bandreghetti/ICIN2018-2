@@ -8,7 +8,7 @@ import sys
 from keras.datasets import cifar10
 
 from keras.models import Sequential, load_model
-from keras.layers import Dense, Dropout, Flatten
+from keras.layers import Dense, Dropout, Flatten, Reshape
 from keras.layers.convolutional import Conv2D, MaxPooling2D
 
 from keras.callbacks import EarlyStopping
@@ -34,6 +34,7 @@ def main():
     y_test = to_categorical(y_test_idx)
 
     num_classes = y_test[0].size
+    print('Number of classes to recognize: {}'.format(num_classes))
 
     if os.path.isfile(modelFilename):
         print('Loading pre-trained model {}'.format(modelName))
@@ -137,7 +138,8 @@ def main():
             model.add(Dropout(0.2))
         # This network has no convolutional layers
         elif modelName == 'model5':
-            model.add(Dense(1024, input_shape=(32, 32, 3), activation='relu'))
+            model.add(Reshape((3072, ), input_shape=(32, 32, 3)))
+            model.add(Dense(1024, activation='relu'))
             model.add(Dropout(0.2))
             model.add(Dense(512, activation='relu'))
             model.add(Dropout(0.2))
@@ -224,9 +226,7 @@ def main():
         model.add(Dense(num_classes, activation='softmax'))
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-        print(model.summary)
-
-        model.save(modelFilename)
+        print(model.summary())
 
     earlyStopping = EarlyStopping(monitor='val_loss', patience=20, verbose=1)
 
