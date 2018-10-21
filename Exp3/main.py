@@ -129,7 +129,6 @@ def main():
             model.add(Conv2D(128, (3, 3), activation='relu', padding='valid'))
             model.add(Dropout(0.2))
             model.add(Conv2D(128, (3, 3), activation='relu', padding='valid'))
-            model.add(MaxPooling2D(pool_size=(2, 2)))
             model.add(Flatten())
             model.add(Dropout(0.2))
             model.add(Dense(1024, activation='relu'))
@@ -138,8 +137,7 @@ def main():
             model.add(Dropout(0.2))
         # This network has no convolutional layers
         elif modelName == 'model5':
-            model.add(Flatten())
-            model.add(Dense(1024, input_shape=(3072,), activation='relu'))
+            model.add(Dense(1024, input_shape=(32, 32, 3), activation='relu'))
             model.add(Dropout(0.2))
             model.add(Dense(512, activation='relu'))
             model.add(Dropout(0.2))
