@@ -4,6 +4,7 @@ import numpy as np
 import time
 import os
 import sys
+import shutil
 
 from keras.datasets import cifar10
 
@@ -12,7 +13,9 @@ from keras.layers import Dense, Dropout, Flatten, Reshape
 from keras.layers.convolutional import Conv2D, MaxPooling2D
 
 from keras.callbacks import EarlyStopping
-from keras.utils import to_categorical
+from keras.utils import to_categorical, print_summary
+
+import matplotlib.pyplot as plt
 
 def main():
     if len(sys.argv) < 3:
@@ -20,6 +23,9 @@ def main():
         exit()
     modelName = sys.argv[1]
     nEpochs = int(sys.argv[2])
+
+    if os.path.isdir(modelName):
+        shutil.rmtree(modelName)
 
     modelFilename = '{}.h5'.format(modelName)
 
@@ -226,20 +232,51 @@ def main():
         model.add(Dense(num_classes, activation='softmax'))
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-        print(model.summary())
-
     earlyStopping = EarlyStopping(monitor='val_loss', patience=20, verbose=1)
 
     print('Training {} for {} epochs'.format(modelName, nEpochs))
 
-    model.fit(x_train, y_train, validation_data=(x_test, y_test),
+    hist = model.fit(x_train, y_train, validation_data=(x_test, y_test),
           epochs=nEpochs, batch_size=128, shuffle=True,
           callbacks=[earlyStopping], verbose=2)
 
     scores = model.evaluate(x_test, y_test, verbose=0)
     print("Accuracy: %.2f%%" % (scores[1]*100))
 
-    model.save(modelFilename)
+    # From here on, save all data about the training and network performance
+
+    os.makedirs(os.path.join(modelName, 'hit'), exist_ok=True)
+    os.makedirs(os.path.join(modelName, 'miss'), exist_ok=True)
+
+    np.save(os.path.join(modelName, 'train_history'), hist)
+
+    fig = plt.figure(figsize=(15,8))
+    plt.plot(hist.history['acc'])
+    plt.plot(hist.history['val_acc'])
+    plt.title('{} accuracy'.format(modelName), size=20)
+    plt.ylabel('Accuracy', size=20)
+    plt.xlabel('Epoch', size=20)
+    plt.legend(['train', 'test'], loc='upper left', prop={'size':15})
+    plt.savefig(os.path.join(modelName, 'accuracy_history.png'), dpi=300)
+    plt.close(fig)
+
+    # serialize model to JSON
+    model_json = model.to_json()
+    with open(os.path.join(modelName, 'model.json'), "w") as json_file:
+        json_file.write(model_json)
+    # serialize weights to HDF5
+    model.save_weights(os.path.join(modelName, 'model.h5'))
+
+    with open(os.path.join(modelName, 'summary.txt'), 'w') as summary_file:
+        scores = model.evaluate(x_test, y_test, verbose=0)
+        summary_file.write('Accuracy: {}\n\n'.format((scores[1]*100)))
+        print_summary(model, print_fn=lambda x: summary_file.write(x + '\n'))
+        summary_file.close()
+
+    print("Saved model to disk")
+
+
+
 
 if __name__ == '__main__':
     main()
