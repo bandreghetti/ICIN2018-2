@@ -29,8 +29,6 @@ def main():
     if os.path.isdir(modelName):
         shutil.rmtree(modelName)
 
-    modelFilename = '{}.h5'.format(modelName)
-
     np.random.seed(int(time.time()))
 
     (x_train, y_train_idx), (x_test, y_test_idx) = cifar10.load_data()
