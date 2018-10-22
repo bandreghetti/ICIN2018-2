@@ -263,6 +263,7 @@ def main():
     plt.title('{} accuracy'.format(modelName), size=20)
     plt.ylabel('Accuracy', size=20)
     plt.xlabel('Epoch', size=20)
+    plt.ylim(0, 1)
     plt.legend(['train', 'test'], loc='upper left', prop={'size':15})
     plt.savefig(os.path.join(modelName, 'accuracy_history.png'), dpi=300)
     plt.close(fig)
