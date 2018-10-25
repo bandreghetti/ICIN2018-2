@@ -8,12 +8,12 @@ import shutil
 
 from keras.datasets import cifar10
 
-from keras.models import load_model
+from keras.models import load_model, model_from_json
 
 from keras.utils import to_categorical, print_summary
 
 import matplotlib.pyplot as plt
-from matplotlib.offsetbox import TextArea, DrawingArea, OffsetImage, AnnotationBbox
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 def main():
     if len(sys.argv) < 3:
@@ -21,13 +21,27 @@ def main():
         exit()
     modelName = sys.argv[1]
     nSamples = int(sys.argv[2])
-    modelFilename = '{}.h5'.format(modelName)
 
     print('Loading pre-trained model {}'.format(modelName))
-    model = load_model(modelFilename)
+    # load json and create model
+    json_path = os.path.join(modelName, 'model.json')
+    with open(json_path, 'r') as json_file:
+        json_file = open(json_path, 'r')
+        loaded_model_json = json_file.read()
+        json_file.close() 
+    model = model_from_json(loaded_model_json)
+    
+    # load weights into new model
+    weightsPath = os.path.join(modelName, 'model.h5')
+    model.load_weights(weightsPath)
+    print("Loaded model from disk")
 
-    # if os.path.isdir(modelName):
-    #     shutil.rmtree(modelName)
+    hitFolder = os.path.join(modelName, 'hit')
+    if os.path.isdir(hitFolder):
+        shutil.rmtree(hitFolder)
+    missFolder = os.path.join(modelName, 'miss')
+    if os.path.isdir(missFolder):
+        shutil.rmtree(missFolder)
 
     os.makedirs(os.path.join(modelName, 'hit'), exist_ok=True)
     os.makedirs(os.path.join(modelName, 'miss'), exist_ok=True)
@@ -37,39 +51,33 @@ def main():
     x_test = x_test.astype('float64') / 255.0
     y_test = to_categorical(y_test)
 
-    # summary_file = open(os.path.join(modelName, 'summary.txt'), 'w')
-    # # summary_file.write()
-    # scores = model.evaluate(x_test, y_test, verbose=0)
-    # summary_file.write('Accuracy: {}\n\n'.format((scores[1]*100)))
-    # print_summary(model, print_fn=lambda x: summary_file.write(x + '\n'))
-    # summary_file.close()
-
     choices = np.random.choice(x_test.shape[0], nSamples, replace=False)
     x_test = x_test[choices]
     y_test = np.argmax(y_test[choices], axis=1)
 
     proba = model.predict(x_test)
     guess = np.argmax(proba, axis=1)
-    sortIdx = np.argsort(proba, axis=1)
+    sortIdx = np.flip(np.argsort(proba, axis=1), axis=1)
 
     classNames = np.array(['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck'])
 
     for idx, (img, g, p, sort, target) in enumerate(zip(x_test, guess, proba, sortIdx, y_test)):
         fig, ax = plt.subplots()
 
-        index = np.arange(1, 7)
-        prob = p[sort][0:6]
-        rects1 = ax.bar(index, prob, 0.7, color='b', alpha=0.6)
-        classLabels = classNames[sort][0:6]
+        index = np.arange(1, 6)
+        prob = p[sort][0:5]
+        _ = ax.bar(index, prob, 0.7, color='b', alpha=0.6)
+        classLabels = np.append('', classNames[sort])
         ax.set_xticklabels(classLabels)
+        plt.title(classNames[target])
         plt.ylabel('Predicted probability', size=10)
         plt.ylim(0, 1)
 
-        imagebox = OffsetImage(img, zoom=3.)
+        imagebox = OffsetImage(img, zoom=4.)
         imagebox.image.axes = ax
 
         ab = AnnotationBbox(imagebox, (1, 1),
-                        xybox=(296, 0),
+                        xybox=(354, 0),
                         xycoords='data',
                         boxcoords="offset points",
                         box_alignment=(1., 1.),
@@ -79,13 +87,11 @@ def main():
         ax.add_artist(ab)
 
         fig.tight_layout()
-        plt.savefig(os.path.join(modelName, 'barchart.png'), dpi=300)
-
         if g == target:
-            print(' Hit! {}'.format(idx))
+            folder = os.path.join(modelName, 'hit')
         else:
-            print('Miss! {}'.format(idx))
-
+            folder = os.path.join(modelName, 'miss')
+        plt.savefig(os.path.join(folder, '{}.png'.format(idx)), dpi=300)
         plt.close(fig)
 
 
