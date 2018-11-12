@@ -1,0 +1,47 @@
+[System]
+Name='manual'
+Type='mamdani'
+Version=2.0
+NumInputs=2
+NumOutputs=1
+NumRules=9
+AndMethod='min'
+OrMethod='max'
+ImpMethod='min'
+AggMethod='max'
+DefuzzMethod='centroid'
+
+[Input1]
+Name='ref'
+Range=[-3.92699081698724 3.92699081698724]
+NumMFs=3
+MF1='right':'gaussmf',[2 -3.93]
+MF2='zero':'gaussmf',[0.1 0]
+MF3='left':'gaussmf',[2 3.927]
+
+[Input2]
+Name='out'
+Range=[-3.927 3.927]
+NumMFs=3
+MF1='right':'gaussmf',[2 -3.927]
+MF2='balanced':'gaussmf',[0.4 0]
+MF3='left':'gaussmf',[2 3.927]
+
+[Output1]
+Name='u'
+Range=[-60 60]
+NumMFs=3
+MF1='turnCW':'gaussmf',[30 -60]
+MF2='wait':'gaussmf',[10 0]
+MF3='turnCCW':'gaussmf',[30 60]
+
+[Rules]
+1 2, 1 (1) : 1
+1 3, 1 (1) : 1
+1 1, 2 (1) : 1
+2 1, 3 (1) : 1
+2 2, 2 (1) : 1
+2 3, 1 (1) : 1
+3 3, 2 (1) : 1
+3 2, 3 (1) : 1
+3 1, 3 (1) : 1
