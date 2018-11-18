@@ -65,4 +65,4 @@ Exp3/caltech101.tar.gz
 
 *.h5
 
-*.ipynb
+# *.ipynb
