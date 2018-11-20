@@ -38,6 +38,10 @@ def make_maze(mx, my):
 	        stack.append((cx, cy))
 	    else: stack.pop()
 
+	for _ in range(int(np.round((mx + my)/2))):
+		# maze[(np.random.randint(0, my - 1), np.random.randint(0, mx - 1))] = 1 - maze[(np.random.randint(0, my - 1), np.random.randint(0, mx - 1))]
+		maze[(np.random.randint(0, my - 1), np.random.randint(0, mx - 1))] = 1
+
 	return np.abs(maze.T - 1)  # transpose and invert 0s and 1s
 
 if __name__ == '__main__':

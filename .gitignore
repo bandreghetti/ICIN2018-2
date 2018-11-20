@@ -66,3 +66,10 @@ Exp3/caltech101.tar.gz
 *.h5
 
 # *.ipynb
+
+# ignore virtualenv folders
+bin/
+include/
+lib/
+share/
+etc/

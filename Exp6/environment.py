@@ -15,7 +15,7 @@ class MazeEnv(object):
     action_to_label = {0: 'up', 1: 'down', 2: 'left', 3: 'right'}
     observation_types = ['player_position', 'image']
 
-    def __init__(self, mx=10, my=10, max_reward_treasure=100., reward_wall=-1., observation_type='player_position', new_maze_on_reset=False):
+    def __init__(self, mx=10, my=10, max_reward_treasure=10., reward_wall=-1., observation_type='player_position', new_maze_on_reset=False):
 
         self.mx = mx
         self.my = my
@@ -45,8 +45,9 @@ class MazeEnv(object):
     def _set_up_maze(self):
         self.maze = mazegen.make_maze(self.mx, self.my)
         self.treasure = (0, 0)
-        while self.treasure == (0, 0) or self.maze[self.treasure] == 1:
-            self.treasure = (np.random.randint(self.mx), np.random.randint(self.my))
+        self.treasure = (self.mx-1, self.my-1)
+        if self.maze[self.treasure] == 1:
+            self.maze[self.treasure] = 0
 
     def reset(self):
         if self.new_maze_on_reset:
@@ -100,7 +101,7 @@ class MazeEnv(object):
 
 
     def render(self):
-        fig = plt.figure(figsize=(10, 5))
+        fig = plt.figure(figsize=(self.mx, self.my))
         plt.imshow(self.maze.T, interpolation='none', origin='lower', cmap='Greys')
     #     trajectory_arr = np.array(trajectory)
         plt.plot(self.trajectory_x, self.trajectory_y, 'r')
@@ -110,4 +111,4 @@ class MazeEnv(object):
         plt.ylim(-0.5, self.my - 0.5)
     #     player_marker.set_xdata(player[0])
     #     player_marker.set_ydata(player[1])
-        plt.show(fig)
+        # plt.show(fig)
