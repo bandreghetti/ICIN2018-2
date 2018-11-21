@@ -45,9 +45,11 @@ class MazeEnv(object):
     def _set_up_maze(self):
         self.maze = mazegen.make_maze(self.mx, self.my)
         self.treasure = (0, 0)
-        self.treasure = (self.mx-1, self.my-1)
-        if self.maze[self.treasure] == 1:
-            self.maze[self.treasure] = 0
+        self.treasure = ( np.random.randint(3*self.mx/4, self.mx-1),
+                          np.random.randint(3*self.my/4, self.my-1) )
+        while self.maze[self.treasure] == 1:
+            self.treasure = ( np.random.randint(3*self.mx/4, self.mx-1),
+                              np.random.randint(3*self.my/4, self.my-1) )
 
     def reset(self):
         if self.new_maze_on_reset:
@@ -105,8 +107,9 @@ class MazeEnv(object):
         plt.imshow(self.maze.T, interpolation='none', origin='lower', cmap='Greys')
     #     trajectory_arr = np.array(trajectory)
         plt.plot(self.trajectory_x, self.trajectory_y, 'r')
-        plt.plot(self.treasure[0], self.treasure[1], 'y*', mec='none', markersize=17)
-        player_marker, = plt.plot(self.player[0], self.player[1], 'ro', mec='none', markersize=8)
+        base_size = int(np.round((self.mx+self.my)/2))
+        plt.plot(self.treasure[0], self.treasure[1], 'y*', mec='none', markersize=1.4*base_size)
+        player_marker, = plt.plot(self.player[0], self.player[1], 'ro', mec='none', markersize=0.7*base_size)
         plt.xlim(-0.5, self.mx - 0.5)
         plt.ylim(-0.5, self.my - 0.5)
     #     player_marker.set_xdata(player[0])
